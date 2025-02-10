@@ -1,0 +1,230 @@
+﻿<UserControl x:Class="GM_Task_Manager.GUI.MVVM_Main_Components.View.TodosListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
+             xmlns:local="clr-namespace:GM_Task_Manager.GUI.MVVM_Main_Components.View"
+             xmlns:todotask="clr-namespace:GM_Task_Manager.Store.Entities.ToDoTask"
+             mc:Ignorable="d" 
+             d:DesignHeight="466" d:DesignWidth="549"
+             Background="Transparent">
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="ToDoTaskStatusEnumDataProvider" 
+                        MethodName="GetValues" 
+                        ObjectType="{x:Type system:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="todotask:TaskStatus"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
+            <Setter Property="Margin" Value="3" />
+        </Style>
+        <Style TargetType="{x:Type DataGrid}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="RowBackground" Value="#25000000"/>
+            <Setter Property="AlternatingRowBackground" Value="#40000000"/>
+            <Setter Property="Foreground" Value="#80FFFFFF"/>
+        </Style>
+        <Style TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Background" Value="#40000000"/>
+        </Style>
+        <Style TargetType="{x:Type DataGridRowHeader}">
+            <Setter Property="Background" Value="#40000000"/>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}" x:Key="TextBlockTextTheme">
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#80FFFFFF"/>
+        </Style>
+        <Style TargetType="{x:Type TextBox}" x:Key="TextBoxTextTheme">
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Padding" Value="5,0,0,0"/>
+            <Setter Property="Background" Value="#10FFFFFF"/>
+            <Setter Property="Foreground" Value="#80FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#20FFFFFF"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="{x:Type Button}" x:Key="ButtonWithTextTheme" >
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Button Height="25"
+                                Background="#10FFFFFF"
+                                BorderBrush="#20FFFFFF"
+                                BorderThickness="1"
+                                Foreground="#80FFFFFF"
+                                Content="{TemplateBinding Property=Content}"  
+                                Command="{TemplateBinding Property=Command}"></Button>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <WrapPanel Orientation="Horizontal" Grid.Row="0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Filter by name or description:" Style="{StaticResource TextBlockTextTheme}"/>
+                <TextBox Width="200" Margin="0,3,8,3" Style="{StaticResource TextBoxTextTheme}"
+                     Text="{Binding FilterText_Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <behaviors:Interaction.Triggers>
+                        <behaviors:EventTrigger EventName="TextChanged" >
+                            <behaviors:InvokeCommandAction Command="{Binding UpdateFilterCommand }"/>
+                        </behaviors:EventTrigger>
+                    </behaviors:Interaction.Triggers>
+                </TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Status:" Style="{StaticResource TextBlockTextTheme}"/>
+                <ComboBox Width="100" Height="25" Margin="0,3,8,3"
+                      ItemsSource="{Binding Source={StaticResource ToDoTaskStatusEnumDataProvider}}"
+                      SelectedItem="{Binding StatusFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      VerticalContentAlignment="Center" Foreground="Black"
+                      Opacity="0.8" FlowDirection="LeftToRight">
+                    <ComboBox.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#20FFFFFF" />
+                    </ComboBox.Resources>
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" Foreground="#80FFFFFF" MaxWidth="600"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <behaviors:Interaction.Triggers>
+                        <behaviors:EventTrigger EventName="SelectionChanged" >
+                            <behaviors:InvokeCommandAction Command="{Binding UpdateFilterCommand }"/>
+                        </behaviors:EventTrigger>
+                    </behaviors:Interaction.Triggers>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Created:" Style="{StaticResource TextBlockTextTheme}"/>
+                <TextBox Width="100" Margin="0,3,8,3" Style="{StaticResource TextBoxTextTheme}"
+                     Text="{Binding FilterText_TimeCreated, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <behaviors:Interaction.Triggers>
+                        <behaviors:EventTrigger EventName="TextChanged" >
+                            <behaviors:InvokeCommandAction Command="{Binding UpdateFilterCommand }"/>
+                        </behaviors:EventTrigger>
+                    </behaviors:Interaction.Triggers>
+                </TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Updated:" Style="{StaticResource TextBlockTextTheme}"/>
+                <TextBox Width="100" Margin="0,3,8,3" Style="{StaticResource TextBoxTextTheme}"
+                     Text="{Binding FilterText_TimeUpdated, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <behaviors:Interaction.Triggers>
+                        <behaviors:EventTrigger EventName="TextChanged" >
+                            <behaviors:InvokeCommandAction Command="{Binding UpdateFilterCommand }"/>
+                        </behaviors:EventTrigger>
+                    </behaviors:Interaction.Triggers>
+                </TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Deadline:" Style="{StaticResource TextBlockTextTheme}"/>
+                <TextBox Width="100" Margin="0,3,8,3" Style="{StaticResource TextBoxTextTheme}"
+                     Text="{Binding FilterText_TimeDeadline, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <behaviors:Interaction.Triggers>
+                        <behaviors:EventTrigger EventName="TextChanged" >
+                            <behaviors:InvokeCommandAction Command="{Binding UpdateFilterCommand }"/>
+                        </behaviors:EventTrigger>
+                    </behaviors:Interaction.Triggers>
+                </TextBox>
+            </StackPanel>
+            <Button Margin="3,0,3,0" Style="{StaticResource ButtonWithTextTheme}" Command="{Binding ResetFilters}">
+                <Button.Content>
+                    <TextBlock Foreground="#80FFFFFF" Margin="3,0,3,0" Text="⟲"></TextBlock>
+                </Button.Content>
+            </Button>
+            <Button Margin="3,0,3,0"  Style="{StaticResource ButtonWithTextTheme}" Command="{Binding PrintCommand}" >
+                <Button.Content>
+                    <TextBlock Foreground="#80FFFFFF" Margin="3,0,3,0" Text="Print"></TextBlock>
+                </Button.Content>
+            </Button>
+            <Button Margin="3,0,3,0"  Style="{StaticResource ButtonWithTextTheme}" Command="{Binding SyncCommand}" >
+                <Button.Content>
+                    <TextBlock Foreground="#80FFFFFF" Margin="3,0,3,0" Text="Sync"></TextBlock>
+                </Button.Content>
+            </Button>
+            <Button Margin="3,0,3,0"  Style="{StaticResource ButtonWithTextTheme}" Command="{Binding AddToDoTaskCommand}" IsEnabled="{Binding IsSelectedAnyItemInToDoTaskCollection, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" >
+                <Button.Content>
+                    <TextBlock Foreground="#80FFFFFF" Margin="3,0,3,0" Text="Add"></TextBlock>
+                </Button.Content>
+            </Button>
+            <Button Margin="3,0,3,0"  Style="{StaticResource ButtonWithTextTheme}" Command="{Binding RemoveToDoTaskCommand}" IsEnabled="{Binding IsSelectedAnyItemInToDoTaskCollection, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" >
+                <Button.Content>
+                    <TextBlock Foreground="#80FFFFFF" Margin="3,0,3,0" Text="Remove selected"></TextBlock>
+                </Button.Content>
+            </Button>
+        </WrapPanel>
+        <DataGrid x:Name="ToDoTasksGrid" Grid.Row="1" ItemsSource="{Binding FilteredTodos}" SelectionMode="Extended"
+          IsReadOnly="False" 
+          CanUserAddRows="False"
+          CanUserDeleteRows="True"
+          CanUserResizeColumns="True"
+          CanUserSortColumns="True"
+          BorderThickness="0"  
+          AutoGenerateColumns="False"  
+       >
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
+                   Color="#20FFFFFF"/>
+            </DataGrid.Resources>
+            <behaviors:Interaction.Triggers>
+                <behaviors:EventTrigger EventName="SelectionChanged" >
+                    <behaviors:InvokeCommandAction CommandParameter="{Binding SelectedItems, RelativeSource=
+                    {RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}" Command="{Binding DataGridSelectionChangedCommand }"/>
+                </behaviors:EventTrigger>
+            </behaviors:Interaction.Triggers>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Id" IsReadOnly="True" CanUserResize="False"  >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock HorizontalAlignment="Center" ToolTip="{Binding Id}" Text="🆔"  />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Name}" >
+                    <DataGridTextColumn.Header>
+                        <TextBlock HorizontalAlignment="Center" Text="Name" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn IsReadOnly="False" Binding="{Binding Description}" >
+                    <DataGridTextColumn.Header>
+                        <TextBlock HorizontalAlignment="Left" Text="Description" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridComboBoxColumn IsReadOnly="False" Width="100"
+                                        ItemsSource="{Binding Source={StaticResource ToDoTaskStatusEnumDataProvider}}"
+                                        SelectedItemBinding="{Binding ChangableStatus}">
+                    <DataGridComboBoxColumn.Header>
+                        <TextBlock HorizontalAlignment="Left" Text="Status" />
+                    </DataGridComboBoxColumn.Header>
+                </DataGridComboBoxColumn>
+                <DataGridTextColumn IsReadOnly="True" Width="auto" Binding="{Binding TimeCreated, StringFormat=\{0:HH:mm dd.MM.yy\}}" >
+                    <DataGridTextColumn.Header>
+                        <TextBlock HorizontalAlignment="Center" Text="Created" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn IsReadOnly="True" Width="auto" Binding="{Binding TimeStatusUpdated, StringFormat=\{0:HH:mm dd.MM.yy\}}" >
+                    <DataGridTextColumn.Header>
+                        <TextBlock HorizontalAlignment="Center" Text="Updated" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+                <DataGridTextColumn  IsReadOnly="False" Width="auto" Binding="{Binding TimeDeadline, StringFormat=\{0:HH:mm dd.MM.yy\}}" >
+                    <DataGridTextColumn.Header>
+                        <TextBlock HorizontalAlignment="Center" Text="Deadline" />
+                    </DataGridTextColumn.Header>
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>
